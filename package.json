@@ -1,0 +1,65 @@
+{
+  "name": "audiobookshelf-mcp-server",
+  "version": "0.1.0",
+  "description": "Model Context Protocol (MCP) server for Audiobookshelf: search your library, read listening history and stats, build a taste profile for recommendations, and (optionally) manage progress, collections and playlists.",
+  "keywords": [
+    "audiobookshelf",
+    "mcp",
+    "model-context-protocol",
+    "audiobooks",
+    "claude",
+    "llm",
+    "self-hosted"
+  ],
+  "license": "MIT",
+  "author": "BiffstaGaming",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BiffstaGaming/audiobookshelf-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BiffstaGaming/audiobookshelf-mcp-server/issues"
+  },
+  "homepage": "https://github.com/BiffstaGaming/audiobookshelf-mcp-server#readme",
+  "type": "module",
+  "bin": {
+    "audiobookshelf-mcp-server": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm test",
+    "prepublishOnly": "npm run check && npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.14.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.1.0"
+  }
+}
