@@ -117,6 +117,17 @@ describe('client', () => {
       maxRetries: 0,
     });
     await expect(c.libraries()).rejects.toThrow(/Could not reach Audiobookshelf at http:\/\/x/);
+    const dns = Object.assign(new TypeError('fetch failed'), { cause: { code: 'ENOTFOUND' } });
+    const c2 = new AbsClient({
+      baseUrl: 'http://x',
+      apiKey: 'k',
+      timeoutMs: 1000,
+      cacheTtlSeconds: 0,
+      logger: silentLogger,
+      fetchImpl: vi.fn().mockRejectedValue(dns),
+      maxRetries: 0,
+    });
+    await expect(c2.libraries()).rejects.toThrow(/ENOTFOUND: the host name could not be resolved/);
   });
 });
 

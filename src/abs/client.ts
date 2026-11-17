@@ -118,7 +118,7 @@ export class AbsClient {
         throw new AbsApiError(
           aborted
             ? `Audiobookshelf did not respond within ${this.opts.timeoutMs} ms (${path}). Check ABS_URL or raise ABS_REQUEST_TIMEOUT_MS.`
-            : `Could not reach Audiobookshelf at ${this.opts.baseUrl}: ${(err as Error).message}`,
+            : `Could not reach Audiobookshelf at ${this.opts.baseUrl}: ${describeNetworkError(err)}`,
           null,
           path,
         );
@@ -335,6 +335,27 @@ export class AbsClient {
     await this.request('POST', `/api/libraries/${libraryId}/scan`);
     this.invalidate(`filterdata:${libraryId}`);
   }
+}
+
+/** Node's fetch hides the useful part ("ENOTFOUND", "ECONNREFUSED") in err.cause. */
+export function describeNetworkError(err: unknown): string {
+  const e = err as Error & { cause?: { code?: string; message?: string; hostname?: string } };
+  const code = e.cause?.code;
+  const hints: Record<string, string> = {
+    ENOTFOUND: 'the host name could not be resolved (check the name, or use the IP address)',
+    EAI_AGAIN: 'DNS lookup failed temporarily (check the name, or use the IP address)',
+    ECONNREFUSED: 'the connection was refused (wrong port, or Audiobookshelf is not running)',
+    ETIMEDOUT: 'the connection timed out (host unreachable or blocked by a firewall)',
+    EHOSTUNREACH: 'the host is unreachable from this machine',
+    ECONNRESET: 'the connection was reset (check http vs https)',
+    DEPTH_ZERO_SELF_SIGNED_CERT:
+      'the server uses a self-signed certificate (see NODE_EXTRA_CA_CERTS in the README)',
+    SELF_SIGNED_CERT_IN_CHAIN: 'the certificate chain is self-signed (see NODE_EXTRA_CA_CERTS in the README)',
+    UNABLE_TO_VERIFY_LEAF_SIGNATURE:
+      'the certificate could not be verified (see NODE_EXTRA_CA_CERTS in the README)',
+  };
+  if (code) return `${code}: ${hints[code] ?? e.cause?.message ?? e.message}`;
+  return e.cause?.message ?? e.message;
 }
 
 function sleep(ms: number) {
